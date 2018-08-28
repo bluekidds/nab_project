@@ -41,3 +41,4 @@ class CoreConfig:
         return {
             "dbfile": CoreConfig.__configs.get("DB", "dbfile")
         }
+

@@ -1,8 +1,24 @@
 import pandas as pd
+from ipywidgets import Layout
 
 
-class DisplaySQLToDataframe():
+class Initialization:
+    def __init(self):
+        self.items_layout = Layout(display='flex',
+                                   flex_flow='auto',
+                                   align_items='stretch',
+                                   width='auto')
 
-    @staticmethod
-    def execute(query_string):
-        return None
+        self.box_layout = Layout(display='flex',
+                                 flex_flow='auto',
+                                 align_items='center',
+                                 width='auto')
+
+        self.textarea_layout = Layout(display='flex',
+                                      flex_flow='auto',
+                                      align_items='center',
+                                      width='auto',
+                                      height='120px')
+
+        self.style = {'description_width': 'initial'}
+
