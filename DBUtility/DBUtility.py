@@ -18,6 +18,75 @@ SQL_Schema = """
                 """
 
 
+class CreateVenturesTeamTableIfNotExist:
+    def execute(self):
+        try:
+            logging.getLogger().info("Initialize Ventures team table.")
+
+            BasicOperator().commit("""
+                    CREATE TABLE NAB_VENTURES_TEAM
+                        (
+                            person_name    VARCHAR(100)
+                        ) ;
+            """)
+
+        except Exception as e:
+            logging.getLogger().error("Initialize NAB Deals table\
+            failed. Please Check your connection")
+            logging.getLogger().error(str(e))
+
+
+class CreateDealsTableIfNotExist:
+    def execute(self):
+        try:
+            logging.getLogger().info("Initialize NAB Deals table.")
+
+            BasicOperator().commit("""
+                    CREATE TABLE nab_deals_events_board(
+                      event_date DATE,
+                      company_name VARCHAR(250),                
+                      invested_in VARCHAR(250),     
+                      speaker VARCHAR(50),
+                      notes_organiser VARCHAR(250), 
+                      country VARCHAR(150),
+                      audience SMALLINT,         
+                      website_context VARCHAR(250), 
+                      asset VARCHAR(50),
+                      person_name VARCHAR(250)  
+                    ) ;
+                """)
+
+        except Exception as e:
+            logging.getLogger().error("Initialize NAB Deals table\
+            failed. Please Check your connection")
+            logging.getLogger().error(str(e))
+
+class CreateDealsTableIfNotExist:
+    def execute(self):
+        try:
+            logging.getLogger().info("Initialize NAB Deals table.")
+
+            BasicOperator().commit("""
+                    CREATE TABLE nab_deals_events_board(
+                      event_date DATE,
+                      company_name VARCHAR(250),                
+                      invested_in VARCHAR(250),     
+                      speaker VARCHAR(50),
+                      notes_organiser VARCHAR(250), 
+                      country VARCHAR(150),
+                      audience SMALLINT,         
+                      website_context VARCHAR(250), 
+                      asset VARCHAR(50),
+                      person_name VARCHAR(250)  
+                    ) ;
+                """)
+
+        except Exception as e:
+            logging.getLogger().error("Initialize NAB Deals table\
+            failed. Please Check your connection")
+            logging.getLogger().error(str(e))
+
+
 class CreateEventsTableIfNotExist:
     def execute(self):
         try:
