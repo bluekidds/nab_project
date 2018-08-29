@@ -29,9 +29,20 @@ class CreateVenturesTeamTableIfNotExist:
                             person_name    VARCHAR(100)
                         ) ;
             """)
+            BasicOperator().commit(
+                """
 
+                        INSERT INTO NAB_VENTURES_TEAM 
+                        VALUES 
+                         ( 'Todd Forest'),
+                         ('Melissa Widner'),
+                         ( 'Lucinda Hankin'),
+                         ( 'Jaquelyne Vulligns') ;
+
+                """
+            )
         except Exception as e:
-            logging.getLogger().error("Initialize NAB Deals table\
+            logging.getLogger().error("Initialize Ventures team table\
             failed. Please Check your connection")
             logging.getLogger().error(str(e))
 
@@ -60,6 +71,7 @@ class CreateDealsTableIfNotExist:
             logging.getLogger().error("Initialize NAB Deals table\
             failed. Please Check your connection")
             logging.getLogger().error(str(e))
+
 
 class CreateDealsTableIfNotExist:
     def execute(self):
@@ -142,6 +154,15 @@ class FetchEventsRecordAll:
         return BasicOperator().fetch_all(
             "SELECT * FROM nab_ventures_events_board "
         )
+
+
+class FetchVenturesPerson:
+    def execute(self):
+        team_list = BasicOperator().fetch_all(
+            "SELECT * FROM NAB_VENTURES_TEAM")
+        team_list_clean = [k[i][0] for enumerate(team_list)]
+        return
+
 
 
 class FetchEventsRecordWithinSamePerson:

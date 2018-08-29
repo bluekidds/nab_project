@@ -39,6 +39,6 @@ class CoreConfig:
     @staticmethod
     def get_sqlite3_db_connection_info():
         return {
-            "dbfile": CoreConfig.__configs.get("DB", "dbfile")
+            "dbfile": CoreConfig.__configs.get("DB", "NAB_dbfile"),
         }
 
