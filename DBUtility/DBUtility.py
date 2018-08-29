@@ -73,55 +73,55 @@ class CreateVenturesTeamTableIfNotExist:
 
 
 class CreateDealsTableIfNotExist:
-    def execute(self):
+
+    @staticmethod
+    def execute():
         try:
-            logging.getLogger().info("Initialize NAB Deals table.")
+            logging.getLogger().info("Initialize NAB Done Deals table.")
 
             BasicOperator().commit("""
                     CREATE TABLE nab_deals_events_board(
-                      event_date DATE,
-                      company_name VARCHAR(250),                
-                      invested_in VARCHAR(250),     
-                      speaker VARCHAR(50),
-                      notes_organiser VARCHAR(250), 
-                      country VARCHAR(150),
-                      audience SMALLINT,         
-                      website_context VARCHAR(250), 
-                      asset VARCHAR(50),
-                      person_name VARCHAR(250)  
+                        company_name    VARCHAR(250),
+                        deal_done_Date  DATE,
+                        invested_in     VARCHAR(1000),
+                        aud_invested    REAL
                     ) ;
                 """)
 
         except Exception as e:
-            logging.getLogger().error("Initialize NAB Deals table\
+            logging.getLogger().error("Initialize NAB Done Deals table\
             failed. Please Check your connection")
             logging.getLogger().error(str(e))
 
 
-class CreateDealsTableIfNotExist:
+class InsertDealDoneRecord:
+    def __init__(self, date, company_name,
+                 invested_in, invested):
+
+        self.__date = date
+        self.__company_name = company_name
+        self.__invested_in = invested_in
+        self.__invested = invested
+
     def execute(self):
-        try:
-            logging.getLogger().info("Initialize NAB Deals table.")
+        BasicOperator().commit(
+            "INSERT INTO nab_deals_events_board \
+            (deal_done_Date, company_name, invested_in, aud_invested) \
+             VALUES ('{}','{}', '{}', '{}')".format(self.__date,
+                                                          self.__company_name,
+                                                          self.__invested_in,
+                                                          self.__invested)
+            )
 
-            BasicOperator().commit("""
-                    CREATE TABLE nab_deals_events_board(
-                      event_date DATE,
-                      company_name VARCHAR(250),                
-                      invested_in VARCHAR(250),     
-                      speaker VARCHAR(50),
-                      notes_organiser VARCHAR(250), 
-                      country VARCHAR(150),
-                      audience SMALLINT,         
-                      website_context VARCHAR(250), 
-                      asset VARCHAR(50),
-                      person_name VARCHAR(250)  
-                    ) ;
-                """)
 
-        except Exception as e:
-            logging.getLogger().error("Initialize NAB Deals table\
-            failed. Please Check your connection")
-            logging.getLogger().error(str(e))
+class FetchDealsDoneRecordLastThree:
+
+    def execute(self):
+        return BasicOperator().fetch_all(
+            "SELECT * FROM nab_deals_events_board ORDER BY \
+             deal_done_Date DESC LIMIT 3"
+        )
+
 
 
 class CreateEventsTableIfNotExist:
@@ -178,6 +178,17 @@ class FetchEventsRecordAll:
     def execute(self):
         return BasicOperator().fetch_all(
             "SELECT * FROM nab_ventures_events_board "
+        )
+
+
+class InsertVenturesPerson:
+    def __init__(self, person):
+        self.__person = person
+
+    def execute(self):
+        BasicOperator().commit(
+            "INSERT INTO NAB_VENTURES_TEAM values \
+            ('{}')".format(self.__person)
         )
 
 
