@@ -17,6 +17,31 @@ SQL_Schema = """
                     ) ;
                 """
 
+SQL_Schema_nps = """
+                    CREATE TABLE nab_mobile_nps(
+                      date DATE,
+                      channel VARCHAR(50),
+                      score SMALLINT,         
+                      thoughts VARCHAR(250), 
+                      comments VARCHAR(250)  
+                    ) ;
+                """ 
+
+SQL_Schema_poc = """
+                    CREATE TABLE nab_poc_status(
+                      poc_name VARCHAR(50),
+                      poc_status VARCHAR(50)  
+                    ) ;
+                """    
+
+class DropTable:
+    def __init__(self, table_name):
+        self.__table_name = table_name
+
+    def execute(self):
+        BasicOperator().commit("DROP TABLE {}".format(self.__table_name))
+
+
 
 class CreateVenturesTeamTableIfNotExist:
     def execute(self):
@@ -167,6 +192,98 @@ class FetchEventsLatestRecordWithSamePerson:
              ) tm on t.person_name = tm.person_name and t.event_date = tm.MaxDate"
 
         return BasicOperator().fetch_all(sql_query)
+
+
+class CreatePOCTableIfNotExist:
+    def execute(self):
+        try:
+            logging.getLogger().info("Initialize nab POC table.")
+            BasicOperator().commit(SQL_Schema_poc)
+
+        except Exception as e:
+            logging.getLogger().error("Initialize nab POC table failed. Please check your connection")
+            logging.getLogger().error(str(e))
+
+
+class InsertPOCRecord:
+    def __init__(self, poc_name, poc_status):
+        self.__poc_name = poc_name
+        self.__poc_status = poc_status
+
+    def execute(self):
+        BasicOperator().commit(
+            "INSERT INTO nab_poc_status \
+            (poc_name, poc_status) \
+             VALUES ('{}', '{}')".format(self.__poc_name,
+                                         self.__poc_status))
+
+class UpdatePOCRecord:
+    def __init__(self, poc_name, new_status):
+        self.__poc_name = poc_name
+        self.__new_status = new_status
+
+    def execute(self):
+        BasicOperator().commit(
+            "UPDATE nab_poc_status \
+             SET poc_status = '{}' \
+             WHERE poc_name = '{}'".format(self.__new_status,
+                                         self.__poc_name))
+
+class GetPOCStatus:
+    def __init__(self, poc_name):
+        self.__poc_name = poc_name
+
+    def execute(self):
+        return BasicOperator().fetch_one(
+            "SELECT poc_status FROM nab_poc_status WHERE poc_name = '{}'".format(self.__poc_name)
+        )[0]
+
+
+class FetchPOCRecordAll:
+
+    def execute(self):
+        return BasicOperator().fetch_all(
+            "SELECT * FROM nab_poc_status "
+        )
+
+
+class CreateNPSTableIfNotExist:
+    def execute(self):
+        try:
+            logging.getLogger().info("Initialize nab NPS table.")
+            BasicOperator().commit(SQL_Schema_nps)
+
+        except Exception as e:
+            logging.getLogger().error("Initialize nab NPS table failed. Please check your connection")
+            logging.getLogger().error(str(e))
+
+class InsertNPSRecord:
+    def __init__(self, date, channel, score, thoughts, comments):
+        self.__date = date
+        self.__channel = channel
+        self.__score = score
+        self.__thoughts = thoughts
+        self.__comments = comments
+
+    def execute(self):
+        BasicOperator().commit(
+            "INSERT INTO nab_mobile_nps \
+            (date, channel, score, thoughts, comments) \
+             VALUES ('{}', '{}', '{}', '{}', '{}')".format(self.__date,
+                                                      self.__channel,
+                                                      self.__score,
+                                                      self.__thoughts,
+                                                      self.__comments)
+            )
+
+class FetchNPSRecordAll:
+
+    def execute(self):
+        return BasicOperator().fetch_all(
+            "SELECT * FROM nab_mobile_nps "
+        )
+
+
 
 
 class BasicOperator:
