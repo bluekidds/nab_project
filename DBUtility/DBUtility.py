@@ -185,9 +185,8 @@ class FetchVenturesPerson:
     def execute(self):
         team_list = BasicOperator().fetch_all(
             "SELECT * FROM NAB_VENTURES_TEAM")
-        team_list_clean = [k[i][0] for enumerate(team_list)]
-        return
 
+        return team_list
 
 
 class FetchEventsRecordWithinSamePerson:
