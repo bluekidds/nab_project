@@ -423,10 +423,10 @@ class FetchInitiativesRecordAll:
             "SELECT * FROM nab_initiatives "
         )
 
+class FetchInitiativesRecordRecent:
 
-
-
-
+    def execute(self):
+        return FetchInitiativesRecordAll().execute()[-5:]
 
 
 
