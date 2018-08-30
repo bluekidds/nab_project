@@ -2,37 +2,6 @@ import pymysql
 import logging
 import sqlite3
 
-SQL_Schema = """
-                    CREATE TABLE nab_ventures_events_board(
-                      event_conference_name VARCHAR(250),                
-                      board_meeting VARCHAR(1),     
-                      event_date DATE,
-                      speaker VARCHAR(50),
-                      notes_organiser VARCHAR(250), 
-                      country VARCHAR(150),
-                      audience SMALLINT,         
-                      website_context VARCHAR(250), 
-                      asset VARCHAR(50),
-                      person_name VARCHAR(250)  
-                    ) ;
-                """
-
-SQL_Schema_nps = """
-                    CREATE TABLE nab_mobile_nps(
-                      date DATE,
-                      channel VARCHAR(50),
-                      score SMALLINT,         
-                      thoughts VARCHAR(250), 
-                      comments VARCHAR(250)  
-                    ) ;
-                """ 
-
-SQL_Schema_poc = """
-                    CREATE TABLE nab_poc_status(
-                      poc_name VARCHAR(50),
-                      poc_status VARCHAR(50)  
-                    ) ;
-                """    
 
 class DropTable:
     def __init__(self, table_name):
@@ -129,7 +98,20 @@ class CreateEventsTableIfNotExist:
         try:
             logging.getLogger().info("Initialize nab ventures events board table.")
 
-            BasicOperator().commit(SQL_Schema)
+            BasicOperator().commit("""
+                                      CREATE TABLE nab_ventures_events_board(
+                                        event_conference_name VARCHAR(250),                
+                                        board_meeting VARCHAR(1),     
+                                        event_date DATE,
+                                        speaker VARCHAR(50),
+                                        notes_organiser VARCHAR(250), 
+                                        country VARCHAR(150),
+                                        audience SMALLINT,         
+                                        website_context VARCHAR(250), 
+                                        asset VARCHAR(50),
+                                        person_name VARCHAR(250)  
+                                      ) ;
+                                  """)
 
         except Exception as e:
             logging.getLogger().error("Initialize nab ventures events board\
@@ -229,7 +211,12 @@ class CreatePOCTableIfNotExist:
     def execute(self):
         try:
             logging.getLogger().info("Initialize nab POC table.")
-            BasicOperator().commit(SQL_Schema_poc)
+            BasicOperator().commit("""
+                                      CREATE TABLE nab_poc_status(
+                                        poc_name VARCHAR(50),
+                                        poc_status VARCHAR(50)  
+                                      ) ;
+                                  """)
 
         except Exception as e:
             logging.getLogger().error("Initialize nab POC table failed. Please check your connection")
@@ -282,7 +269,15 @@ class CreateNPSTableIfNotExist:
     def execute(self):
         try:
             logging.getLogger().info("Initialize nab NPS table.")
-            BasicOperator().commit(SQL_Schema_nps)
+            BasicOperator().commit("""
+                                      CREATE TABLE nab_mobile_nps(
+                                        date DATE,
+                                        channel VARCHAR(50),
+                                        score SMALLINT,         
+                                        thoughts VARCHAR(250), 
+                                        comments VARCHAR(250)  
+                                      ) ;
+                                  """ )
 
         except Exception as e:
             logging.getLogger().error("Initialize nab NPS table failed. Please check your connection")
@@ -313,6 +308,125 @@ class FetchNPSRecordAll:
         return BasicOperator().fetch_all(
             "SELECT * FROM nab_mobile_nps "
         )
+
+
+
+
+class CreateNPSTableIfNotExist:
+    def execute(self):
+        try:
+            logging.getLogger().info("Initialize nab NPS table.")
+            BasicOperator().commit("""
+                                      CREATE TABLE nab_mobile_nps(
+                                        date DATE,
+                                        channel VARCHAR(50),
+                                        score SMALLINT,         
+                                        thoughts VARCHAR(250), 
+                                        comments VARCHAR(250)  
+                                      ) ;
+                                  """ )
+
+        except Exception as e:
+            logging.getLogger().error("Initialize nab NPS table failed. Please check your connection")
+            logging.getLogger().error(str(e))
+
+class InsertNPSRecord:
+    def __init__(self, date, channel, score, thoughts, comments):
+        self.__date = date
+        self.__channel = channel
+        self.__score = score
+        self.__thoughts = thoughts
+        self.__comments = comments
+
+    def execute(self):
+        BasicOperator().commit(
+            "INSERT INTO nab_mobile_nps \
+            (date, channel, score, thoughts, comments) \
+             VALUES ('{}', '{}', '{}', '{}', '{}')".format(self.__date,
+                                                      self.__channel,
+                                                      self.__score,
+                                                      self.__thoughts,
+                                                      self.__comments)
+            )
+
+class FetchNPSRecordAll:
+
+    def execute(self):
+        return BasicOperator().fetch_all(
+            "SELECT * FROM nab_mobile_nps "
+        )
+
+
+
+
+
+
+
+
+
+class CreateInitiativesTableIfNotExist:
+    def execute(self):
+        try:
+            logging.getLogger().info("Initialize nab initiatives table.")
+            BasicOperator().commit("""
+                                      CREATE TABLE nab_initiatives(
+                                        initiative_name VARCHAR(150),
+                                        initiative_short_description  VARCHAR(250),
+                                        initiative_category VARCHAR(100),
+                                        creation_date DATE,
+                                        type  VARCHAR(100),
+                                        stakeholder VARCHAR(50),
+                                        team_recommendation VARCHAR(5),
+                                        endorsement_execution VARCHAR(1),
+                                        endorsement_execution_date  Date,
+                                        endorsement_body  VARCHAR(200)  
+                                      ) ;
+                                  """ )
+
+        except Exception as e:
+            logging.getLogger().error("Initialize nab initiatives table failed. Please check your connection")
+            logging.getLogger().error(str(e))
+
+class InsertInitiativesRecord:
+    def __init__(self, initiative_name, initiative_short_description, initiative_category, creation_date, type, stakeholder, team_recommendation, endorsement_execution, endorsement_execution_date, endorsement_body):
+        self.__initiative_name = initiative_name
+        self.__initiative_short_description = initiative_short_description
+        self.__initiative_category = initiative_category
+        self.__creation_date = creation_date
+        self.__type = type
+        self.__stakeholder = stakeholder
+        self.__team_recommendation = team_recommendation
+        self.__endorsement_execution = endorsement_execution
+        self.__endorsement_execution_date = endorsement_execution_date
+        self.__endorsement_body = endorsement_body
+
+    def execute(self):
+        BasicOperator().commit(
+            "INSERT INTO nab_initiatives \
+            (initiative_name, initiative_short_description, initiative_category, creation_date, type, stakeholder, team_recommendation, endorsement_execution, endorsement_execution_date, endorsement_body) \
+             VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(self.__initiative_name,
+                                                            self.__initiative_short_description,
+                                                            self.__initiative_category,
+                                                            self.__creation_date,
+                                                            self.__type,
+                                                            self.__stakeholder,
+                                                            self.__team_recommendation,
+                                                            self.__endorsement_execution,
+                                                            self.__endorsement_execution_date,
+                                                            self.__endorsement_body)
+            )
+
+class FetchInitiativesRecordAll:
+
+    def execute(self):
+        return BasicOperator().fetch_all(
+            "SELECT * FROM nab_initiatives "
+        )
+
+
+
+
+
 
 
 
