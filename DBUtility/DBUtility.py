@@ -41,6 +41,56 @@ class CreateVenturesTeamTableIfNotExist:
             logging.getLogger().error(str(e))
 
 
+class CreateDealsLeverageTableIfNotExist:
+
+    @staticmethod
+    def execute():
+        try:
+            logging.getLogger().info("Initialize NAB Done Leverage \
+            Deals table.")
+
+            BasicOperator().commit("""
+                    CREATE TABLE nab_ventures_deals_leveraged(
+                         company_name            VARCHAR(250),
+                         deal_dleveraged_Date    DATE,
+                         leverage_desc           VARCHAR(1000)
+                    ) ;
+                """)
+
+        except Exception as e:
+            logging.getLogger().error("Initialize NAB Done Leverage \
+            Deals table\
+            failed. Please Check your connection")
+            logging.getLogger().error(str(e))
+
+
+class InsertDealLeverageRecord:
+    def __init__(self, date, company_name,
+                 leverage_desc):
+
+        self.__date = date
+        self.__company_name = company_name
+        self.__leverage_desc = leverage_desc
+
+    def execute(self):
+        BasicOperator().commit(
+            "INSERT INTO nab_ventures_deals_leveraged \
+            (deal_dleveraged_Date, company_name, leverage_desc) \
+             VALUES ('{}','{}', '{}')".format(self.__date,
+                                              self.__company_name,
+                                              self.__leverage_desc)
+            )
+
+
+class FetchDealsLeverageRecordLastThree:
+
+    def execute(self):
+        return BasicOperator().fetch_all(
+            "SELECT * FROM nab_ventures_deals_leveraged ORDER BY \
+             deal_dleveraged_Date DESC LIMIT 5"
+        )
+
+
 class CreateDealsTableIfNotExist:
 
     @staticmethod
@@ -88,9 +138,8 @@ class FetchDealsDoneRecordLastThree:
     def execute(self):
         return BasicOperator().fetch_all(
             "SELECT * FROM nab_deals_events_board ORDER BY \
-             deal_done_Date DESC LIMIT 3"
+             deal_done_Date DESC LIMIT 5"
         )
-
 
 
 class CreateEventsTableIfNotExist:
