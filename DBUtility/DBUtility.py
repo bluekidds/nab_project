@@ -1,4 +1,5 @@
 import pymysql
+import psycopg2
 import logging
 import sqlite3
 
@@ -483,7 +484,7 @@ class FetchInitiativesRecordRecent:
 class BasicOperator:
     @staticmethod
     def fetch_all(query_string):
-        with DBSQLiteConnection() as connection:
+        with DBConnection() as connection:
             cursor = connection.cursor()
             cursor.execute(query_string)
             result = cursor.fetchall()
@@ -492,7 +493,7 @@ class BasicOperator:
 
     @staticmethod
     def fetch_one(query_string):
-        with DBSQLiteConnection() as connection:
+        with DBConnection() as connection:
             cursor = connection.cursor()
             cursor.execute(query_string)
             result = cursor.fetchone()
@@ -501,7 +502,7 @@ class BasicOperator:
 
     @staticmethod
     def commit(query_string):
-        with DBSQLiteConnection() as connection:
+        with DBConnection() as connection:
             cursor = connection.cursor()
             cursor.execute(query_string)
             connection.commit()
@@ -546,13 +547,14 @@ class DBConnection:
         self.connection = None
 
     def __enter__(self):
-        self.connection = pymysql.connect(
+        self.connection = psycopg2.connect(
             host=DBConnection.__host,
             port=DBConnection.__port,
             user=DBConnection.__user,
             password=DBConnection.__password,
-            db=DBConnection.__database,
-            cursorclass=pymysql.cursors.DictCursor
+            database=DBConnection.__database
+            #,
+            #cursorclass=pymysql.cursors.DictCursor
         )
         return self.connection
 
