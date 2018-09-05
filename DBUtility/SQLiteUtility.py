@@ -484,7 +484,7 @@ class FetchInitiativesRecordRecent:
 class BasicOperator:
     @staticmethod
     def fetch_all(query_string):
-        with DBConnection() as connection:
+        with DBSQLiteConnection() as connection:
             cursor = connection.cursor()
             cursor.execute(query_string)
             result = cursor.fetchall()
@@ -493,7 +493,7 @@ class BasicOperator:
 
     @staticmethod
     def fetch_one(query_string):
-        with DBConnection() as connection:
+        with DBSQLiteConnection() as connection:
             cursor = connection.cursor()
             cursor.execute(query_string)
             result = cursor.fetchone()
@@ -502,7 +502,7 @@ class BasicOperator:
 
     @staticmethod
     def commit(query_string):
-        with DBConnection() as connection:
+        with DBSQLiteConnection() as connection:
             cursor = connection.cursor()
             cursor.execute(query_string)
             connection.commit()
@@ -522,40 +522,6 @@ class DBSQLiteConnection:
     def __enter__(self):
         self.connection = sqlite3.connect(
             self.__dbfile
-        )
-        return self.connection
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.connection.close()
-
-
-class DBConnection:
-    __host = str()
-    __port = int()
-    __user = str()
-    __password = str()
-    __database = str()
-
-    @staticmethod
-    def configure_connection_information(host, port, user, password, database):
-        DBConnection.__host = host
-        DBConnection.__port = port
-        DBConnection.__user = user
-        DBConnection.__password = password
-        DBConnection.__database = database
-
-    def __init__(self):
-        self.connection = None
-
-    def __enter__(self):
-        self.connection = psycopg2.connect(
-            host=DBConnection.__host,
-            port=DBConnection.__port,
-            user=DBConnection.__user,
-            password=DBConnection.__password,
-            database=DBConnection.__database
-            #,
-            #cursorclass=pymysql.cursors.DictCursor
         )
         return self.connection
 
