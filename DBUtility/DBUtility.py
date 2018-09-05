@@ -2,6 +2,7 @@ import pymysql
 import psycopg2
 import logging
 import sqlite3
+import datetime
 
 
 class DropTable:
@@ -406,39 +407,104 @@ class FetchNPSRecordAll:
             "SELECT * FROM nab_mobile_nps "
         )
 
+    
+# ----------------------------------------
 
 
-
-
-
-
-
-
-class CreateInitiativesTableIfNotExist:
+class CreateExecutionTableIfNotExist:
     def execute(self):
         try:
-            logging.getLogger().info("Initialize nab initiatives table.")
+            logging.getLogger().info("Initialize nab execution table.")
             BasicOperator().commit("""
-                                      CREATE TABLE nab_initiatives(
-                                        initiative_name VARCHAR(150),
-                                        initiative_short_description  VARCHAR(250),
-                                        initiative_category VARCHAR(100),
-                                        creation_date DATE,
-                                        type  VARCHAR(100),
-                                        stakeholder VARCHAR(50),
-                                        team_recommendation VARCHAR(5),
-                                        endorsement_execution VARCHAR(1),
-                                        endorsement_execution_date  Date,
-                                        endorsement_body  VARCHAR(200)  
-                                      ) ;
+                                      CREATE TABLE nab_Partnership_executed_initiatives(
+                                            initiative_name VARCHAR(150),
+                                            initiative_short_description  VARCHAR(250),
+                                            initiative_category VARCHAR(100),
+                                            creation_date DATE,
+                                            type  VARCHAR(100),
+                                            stakeholder VARCHAR(50),
+                                            execution VARCHAR(1),
+                                            execution_date  Date,
+                                            system_creation_date Timestamp
+                                       ) ;
                                   """ )
 
         except Exception as e:
-            logging.getLogger().error("Initialize nab initiatives table failed. Please check your connection")
+            logging.getLogger().error("Initialize nab execution table failed. Please check your connection")
             logging.getLogger().error(str(e))
 
-class InsertInitiativesRecord:
-    def __init__(self, initiative_name, initiative_short_description, initiative_category, creation_date, type, stakeholder, team_recommendation, endorsement_execution, endorsement_execution_date, endorsement_body):
+class InsertExecutionRecord:
+    def __init__(self, initiative_name, initiative_short_description, initiative_category, creation_date, type, stakeholder, execution, execution_date):
+        self.__initiative_name = initiative_name
+        self.__initiative_short_description = initiative_short_description
+        self.__initiative_category = initiative_category
+        self.__creation_date = creation_date
+        self.__type = type
+        self.__stakeholder = stakeholder
+        self.__execution = execution
+        self.__execution_date = execution_date
+        self.__system_creation_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+
+    def execute(self):
+        BasicOperator().commit(
+            "INSERT INTO nab_Partnership_executed_initiatives \
+            (initiative_name, initiative_short_description, initiative_category, creation_date, type, stakeholder, team_recommendation, execution, execution_date, endorsement_body, system_creation_date) \
+             VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(self.__initiative_name,
+                                                            self.__initiative_short_description,
+                                                            self.__initiative_category,
+                                                            self.__creation_date,
+                                                            self.__type,
+                                                            self.__stakeholder,
+                                                            self.__execution,
+                                                            self.__execution_date,
+                                                            self.__system_creation_date)
+            )
+
+class FetchExecutionRecordAll:
+
+    def execute(self):
+        return BasicOperator().fetch_all(
+            "SELECT * FROM nab_Partnership_executed_initiatives "
+        )
+
+class FetchExecutionRecordRecent:
+
+    def execute(self):
+        return BasicOperator().fetch_all(
+            "SELECT top 10 * FROM nab_Partnership_executed_initiatives order by system_creation_date DESC"
+        )
+
+
+
+# -----------------------------------------------------------
+
+class CreateEndorsementTableIfNotExist:
+    def execute(self):
+        try:
+            logging.getLogger().info("Initialize nab endorsement table.")
+            BasicOperator().commit("""
+                                      CREATE TABLE nab_Partnership_endorsed_initiatives(
+                                            initiative_name VARCHAR(150),
+                                            initiative_short_description  VARCHAR(250),
+                                            initiative_category VARCHAR(100),
+                                            creation_date DATE,
+                                            type  VARCHAR(100),
+                                            stakeholder VARCHAR(50),
+                                            team_recommendation VARCHAR(5),
+                                            endorsement VARCHAR(1),
+                                            endorsement_date  Date,
+                                            endorsement_body  VARCHAR(200),
+                                            system_creation_date Timestamp
+                                       ) ;
+                                  """ )
+
+        except Exception as e:
+            logging.getLogger().error("Initialize nab endorsement table failed. Please check your connection")
+            logging.getLogger().error(str(e))
+
+class InsertEndorsementRecord:
+    def __init__(self, initiative_name, initiative_short_description, initiative_category, creation_date, type, stakeholder, team_recommendation, endorsement, endorsement_date, endorsement_body):
         self.__initiative_name = initiative_name
         self.__initiative_short_description = initiative_short_description
         self.__initiative_category = initiative_category
@@ -446,40 +512,48 @@ class InsertInitiativesRecord:
         self.__type = type
         self.__stakeholder = stakeholder
         self.__team_recommendation = team_recommendation
-        self.__endorsement_execution = endorsement_execution
-        self.__endorsement_execution_date = endorsement_execution_date
+        self.__endorsement = endorsement
+        self.__endorsement_date = endorsement_date
         self.__endorsement_body = endorsement_body
+        self.__system_creation_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
 
     def execute(self):
         BasicOperator().commit(
-            "INSERT INTO nab_initiatives \
-            (initiative_name, initiative_short_description, initiative_category, creation_date, type, stakeholder, team_recommendation, endorsement_execution, endorsement_execution_date, endorsement_body) \
-             VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(self.__initiative_name,
+            "INSERT INTO nab_Partnership_endorsed_initiatives \
+            (initiative_name, initiative_short_description, initiative_category, creation_date, type, stakeholder, team_recommendation, endorsement, endorsement_date, endorsement_body, system_creation_date) \
+             VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(self.__initiative_name,
                                                             self.__initiative_short_description,
                                                             self.__initiative_category,
                                                             self.__creation_date,
                                                             self.__type,
                                                             self.__stakeholder,
                                                             self.__team_recommendation,
-                                                            self.__endorsement_execution,
-                                                            self.__endorsement_execution_date,
-                                                            self.__endorsement_body)
+                                                            self.__endorsement,
+                                                            self.__endorsement_date,
+                                                            self.__endorsement_body,
+                                                            self.__system_creation_date)
             )
 
-class FetchInitiativesRecordAll:
+class FetchEndorsementRecordAll:
 
     def execute(self):
         return BasicOperator().fetch_all(
-            "SELECT * FROM nab_initiatives "
+            "SELECT * FROM nab_Partnership_endorsed_initiatives "
         )
 
-class FetchInitiativesRecordRecent:
+class FetchEndorsementRecordRecent:
 
     def execute(self):
-        return FetchInitiativesRecordAll().execute()[-5:]
+        return BasicOperator().fetch_all(
+            "SELECT top 10 * FROM nab_Partnership_endorsed_initiatives order by system_creation_date DESC"
+        )
 
 
 
+  
+    
+    
 
 class BasicOperator:
     @staticmethod
