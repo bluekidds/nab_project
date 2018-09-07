@@ -12,6 +12,131 @@ class DropTable:
         BasicOperator().commit("DROP TABLE {}".format(self.__table_name))
 
 
+class FetchNABRecordAll:
+
+    def execute(self):
+        return BasicOperator().fetch_all(
+            "SELECT * FROM nab_labs_initiatives_cycle LIMIT 5"
+        )
+
+
+class CreateNABTableIfNotExist:
+    def execute(self):
+        try:
+            logging.getLogger().info("Initialize NAB Labs table")
+
+            BasicOperator().commit("""
+                    CREATE TABLE nab_labs_initiatives_cycle
+                        (
+                            initiative_name VARCHAR(200),
+                            decision_made   VARCHAR(100),
+                            reason          VARCHAR(200),
+                            comments        VARCHAR(500),
+                            experiment_flag VARCHAR(1),
+                            experiment_date DATE,
+                            hacks_flag      VARCHAR(1),
+                            hacks_date      DATE,
+                            poc_flag        VARCHAR(1),
+                            poc_date        DATE,
+                            incubated_flag  VARCHAR(1),
+                            incubated_date  DATE,
+                            exited_flag     VARCHAR(1),
+                            exited_date     DATE,
+                            system_date     timestamp
+                        ) ;
+
+            """
+                                   )
+        except Exception as e:
+            logging.getLogger().error("Initialize NAB Labs table\
+            failed. Please Check your connection")
+            logging.getLogger().error(str(e))
+
+
+class InsertNABTableRecord:
+    def __init__(self, initiative_name, decision_made, reason,
+                 comments, experiment_flag, experiment_date, hacks_flag,
+                 hacks_date, poc_flag, poc_date, incubated_flag,
+                 incubated_date, exited_flag, exited_date, system_date):
+
+        self.__initiative_name = initiative_name
+        self.__decision_made = decision_made
+        self.__reason = reason
+        self.__comments = comments
+        self.__experiment_flag = experiment_flag
+        self.__experiment_date = experiment_date
+        self.__hacks_flag = hacks_flag
+        self.__hacks_date = hacks_date
+        self.__poc_flag = poc_flag
+        self.__poc_date = poc_date
+        self.__incubated_flag = incubated_flag
+        self.__incubated_date = incubated_date
+        self.__exited_flag = exited_flag
+        self.__exited_date = exited_date
+        self.__system_date = system_date
+
+    def execute(self):
+        BasicOperator().commit(
+            "INSERT INTO nab_labs_initiatives_cycle \
+            (initiative_name, decision_made, reason, \
+             comments, experiment_flag, experiment_date, hacks_flag, \
+             hacks_date, poc_flag, poc_date, incubated_flag, \
+            incubated_date, exited_flag, exited_date, system_date) \
+             VALUES ('{}','{}', '{}', '{}','{}', '{}', \
+                    '{}','{}', '{}', '{}','{}', '{}', \
+                    '{}','{}', '{}' )".format(self.__initiative_name,
+                                              self.__decision_made,
+                                              self.__reason,
+                                              self.__comments,
+                                              self.__experiment_flag,
+                                              self.__experiment_date,
+                                              self.__hacks_flag,
+                                              self.__hacks_date,
+                                              self.__poc_flag,
+                                              self.__poc_date,
+                                              self.__incubated_flag,
+                                              self.__incubated_date,
+                                              self.__exited_flag,
+                                              self.__exited_date,
+                                              self.__system_date)
+            )
+
+
+class CreateVenturesEngagementTableIfNotExist:
+    def execute(self):
+        try:
+            logging.getLogger().info("Initialize Ventures engagement table.")
+
+            BasicOperator().commit("""
+                    CREATE TABLE nab_ventures_engagement_types
+                        (
+                            Engagement_type    VARCHAR(250)
+                        ) ;
+            """)
+            BasicOperator().commit(
+                """
+
+                        INSERT INTO nab_ventures_engagement_types
+                        VALUES 
+                         ('Speaking Event'),
+                         ('Event Attended'),
+                         ('Board Meeting');
+
+                """
+            )
+        except Exception as e:
+            logging.getLogger().error("Initialize Ventures engagement table\
+            failed. Please Check your connection")
+            logging.getLogger().error(str(e))
+
+
+class FetchVenturesEngagement:
+    def execute(self):
+        engagement_list = BasicOperator().fetch_all(
+            "SELECT * FROM nab_ventures_engagement_types")
+
+        return engagement_list
+
 
 class CreateVenturesTeamTableIfNotExist:
     def execute(self):
@@ -393,11 +518,12 @@ class InsertNPSRecord:
             "INSERT INTO nab_mobile_nps \
             (date, channel, score, thoughts, comments) \
              VALUES ('{}', '{}', '{}', '{}', '{}')".format(self.__date,
-                                                      self.__channel,
-                                                      self.__score,
-                                                      self.__thoughts,
-                                                      self.__comments)
+                                                           self.__channel,
+                                                           self.__score,
+                                                           self.__thoughts,
+                                                           self.__comments)
             )
+
 
 class FetchNPSRecordAll:
 
@@ -405,13 +531,6 @@ class FetchNPSRecordAll:
         return BasicOperator().fetch_all(
             "SELECT * FROM nab_mobile_nps "
         )
-
-
-
-
-
-
-
 
 
 class CreateInitiativesTableIfNotExist:
@@ -473,12 +592,11 @@ class FetchInitiativesRecordAll:
             "SELECT * FROM nab_initiatives "
         )
 
+
 class FetchInitiativesRecordRecent:
 
     def execute(self):
         return FetchInitiativesRecordAll().execute()[-5:]
-
-
 
 
 class BasicOperator:
@@ -506,7 +624,6 @@ class BasicOperator:
             cursor = connection.cursor()
             cursor.execute(query_string)
             connection.commit()
-
 
 
 class DBSQLiteConnection:
