@@ -13,6 +13,51 @@ class DropTable:
         BasicOperator().commit("DROP TABLE {}".format(self.__table_name))
 
 
+class FetchVenturesDealLeadsRecordAll:
+
+    def execute(self):
+        return BasicOperator().fetch_all(
+            "SELECT * FROM nab_ventures_deals_leads LIMIT 5"
+        )
+
+
+class CreateVenturesDealLeadsIfNotExist:
+    def execute(self):
+        try:
+            logging.getLogger().info("Initialize Ventures Deals Leads table")
+
+            BasicOperator().commit("""
+                    CREATE TABLE nab_ventures_deals_leads
+                    (
+                        person_name    VARCHAR(100)
+                        deals_leads_date Date
+                        number_of_leads Integer
+                    ) ;
+            """
+                                   )
+        except Exception as e:
+            logging.getLogger().error("Initialize  Ventures Deals Leads table\
+            failed. Please Check your connection")
+            logging.getLogger().error(str(e))
+
+
+class InsertVenturesDealLeadsRecord:
+    def __init__(self, person_name, deals_leads_date, number_of_leads):
+
+        self.__person_name = person_name
+        self.__deals_leads_date = deals_leads_date
+        self.__number_of_leads = number_of_leads
+
+    def execute(self):
+        BasicOperator().commit(
+            "INSERT INTO nab_ventures_deals_leads \
+            (person_name, deals_leads_date, number_of_leads) \
+             VALUES ('{}','{}', '{}')".format(self.__person_name,
+                                              self.__deals_leads_date,
+                                              self.__number_of_leads)
+            )
+
+
 class FetchNABRecordAll:
 
     def execute(self):
@@ -101,7 +146,6 @@ class InsertNABTableRecord:
                                               self.__exited_date,
                                               self.__system_date)
             )
-
 
 
 class CreateVenturesEngagementTableIfNotExist:
@@ -276,18 +320,20 @@ class CreateEventsTableIfNotExist:
             logging.getLogger().info("Initialize nab ventures events board table.")
 
             BasicOperator().commit("""
-                                      CREATE TABLE nab_ventures_events_board(
-                                        event_conference_name VARCHAR(250),                
-                                        board_meeting VARCHAR(1),     
-                                        event_date DATE,
-                                        speaker VARCHAR(50),
-                                        notes_organiser VARCHAR(250), 
-                                        country VARCHAR(150),
-                                        audience SMALLINT,         
-                                        website_context VARCHAR(250), 
-                                        asset VARCHAR(50),
-                                        person_name VARCHAR(250)  
-                                      ) ;
+                                      CREATE TABLE nab_ventures_events_board
+                                    (
+                                        event_conference_name    VARCHAR(250),             
+                                        event_date         DATE,
+                                        engagement_type          VARCHAR(50),
+                                        notes_organiser          VARCHAR(250),
+                                        location        VARCHAR(250),  
+                                        country            VARCHAR(150),
+                                        Quality               SMALLINT,
+                                        audience      SMALLINT, 
+                                        website_context          VARCHAR(250),  
+                                        asset              VARCHAR(50),
+                                        person_name        VARCHAR(250)   
+                                    ) ;
                                   """)
 
         except Exception as e:
@@ -297,16 +343,18 @@ class CreateEventsTableIfNotExist:
 
 
 class InsertEventRecord:
-    def __init__(self, event_conference_name, board_meeting,
-                 event_date, speaker,
-                 notes_organiser, country, audience, website_context,
+    def __init__(self, event_conference_name,
+                 event_date, engagement_type,
+                 notes_organiser, location,
+                 country, Quality, audience, website_context,
                  asset, person_name):
         self.__event_conference_name = event_conference_name
-        self.__board_meeting = board_meeting
         self.__event_date = event_date
-        self.__speaker = speaker
+        self.__engagement_type = engagement_type
         self.__notes_organiser = notes_organiser
+        self.__location = location
         self.__country = country
+        self.__Quality = Quality
         self.__audience = audience
         self.__website_context = website_context
         self.__asset = asset
@@ -315,16 +363,17 @@ class InsertEventRecord:
     def execute(self):
         BasicOperator().commit(
             "INSERT INTO nab_ventures_events_board \
-            (event_conference_name, board_meeting, event_date, \
-             speaker, notes_organiser, country, audience, \
+            (event_conference_name, event_date, engagement_type,\
+             notes_organiser, location, country, Quality, audience, \
              website_context, asset, person_name) \
-             VALUES ('{}', '{}', '{}', '{}', '{}', '{}',\
+             VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}',\
                      '{}', '{}', '{}', '{}')".format(self.__event_conference_name,
-                                                     self.__board_meeting,
                                                      self.__event_date,
-                                                     self.__speaker,
+                                                     self.__engagement_type,
                                                      self.__notes_organiser,
+                                                     self.__location,
                                                      self.__country,
+                                                     self.__Quality,
                                                      self.__audience,
                                                      self.__website_context,
                                                      self.__asset,
