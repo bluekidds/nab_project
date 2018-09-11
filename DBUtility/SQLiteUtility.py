@@ -77,6 +77,8 @@ class CreateNABTableIfNotExist:
                             decision_made   VARCHAR(100),
                             reason          VARCHAR(200),
                             comments        VARCHAR(500),
+                            closed_flag     VARCHAR(1),
+                            closed_date     DATE,
                             experiment_flag VARCHAR(1),
                             experiment_date DATE,
                             hacks_flag      VARCHAR(1),
@@ -100,13 +102,16 @@ class CreateNABTableIfNotExist:
 
 class InsertNABTableRecord:
     def __init__(self, initiative_name, decision_made, reason,
-                 comments, experiment_flag, experiment_date, hacks_flag,
+                 comments, closed_flag, closed_date,
+                 experiment_flag, experiment_date, hacks_flag,
                  hacks_date, poc_flag, poc_date, incubated_flag,
                  incubated_date, exited_flag, exited_date, system_date):
 
         self.__initiative_name = initiative_name
         self.__decision_made = decision_made
         self.__reason = reason
+        self.__closed_flag = closed_flag
+        self.__close_date = closed_date
         self.__comments = comments
         self.__experiment_flag = experiment_flag
         self.__experiment_date = experiment_date
@@ -124,15 +129,18 @@ class InsertNABTableRecord:
         BasicOperator().commit(
             "INSERT INTO nab_labs_initiatives_cycle \
             (initiative_name, decision_made, reason, \
-             comments, experiment_flag, experiment_date, hacks_flag, \
+             comments, closed_flag, closed_date, \
+             experiment_flag, experiment_date, hacks_flag, \
              hacks_date, poc_flag, poc_date, incubated_flag, \
             incubated_date, exited_flag, exited_date, system_date) \
-             VALUES ('{}','{}', '{}', '{}','{}', '{}', \
+             VALUES ('{}','{}', '{}','{}','{}', '{}','{}', '{}', \
                     '{}','{}', '{}', '{}','{}', '{}', \
                     '{}','{}', '{}' )".format(self.__initiative_name,
                                               self.__decision_made,
                                               self.__reason,
                                               self.__comments,
+                                              self.__closed_flag,
+                                              self.__close_date,
                                               self.__experiment_flag,
                                               self.__experiment_date,
                                               self.__hacks_flag,
